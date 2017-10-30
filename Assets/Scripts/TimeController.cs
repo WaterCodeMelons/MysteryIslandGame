@@ -75,7 +75,7 @@ public class TimeController : MonoBehaviour {
 		// Noc - kolor czarny rgba(0, 0, 0, 1)
 		// Podczas wschodu kolor zmienia się z czarnego rgba(0, 0, 0, 1) na szary rgba(128, 128, 128, 255)
 		// Podczas zachodu kolor zmienia się z szarego rgba(128, 128, 128, 255) na czarny rgba(0, 0, 0, 255)
-		RenderSettings.fogColor = new Color(0.5f*intensityMultiplier, 0.5f*intensityMultiplier, 0.5f*intensityMultiplier, 1f);
+		RenderSettings.fogColor = new Color(0.2f*intensityMultiplier, 0.2f*intensityMultiplier, 0.2f*intensityMultiplier, 1f);
 
 		// Zmienia ekspozycję skyboxa i blokuje ją pomiędzy [0.25 - 0.8]
 		RenderSettings.skybox.SetFloat("_Exposure", Mathf.Clamp(0.8f * intensityMultiplier, 0.025f, 0.8f));
