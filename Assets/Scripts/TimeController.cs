@@ -34,7 +34,7 @@ public class TimeController : MonoBehaviour {
 		// 
 		time += (Time.deltaTime / (minutesInAFullDay * 60));
 		day = (int)time;
-		hour = (int)(currentTimeOfDay*24)+":"+(int)((currentTimeOfDay*24*60) - ((int)(currentTimeOfDay*24)*60));
+        hour = (int)(currentTimeOfDay*24)+":"+((int)((currentTimeOfDay*24*60) - ((int)(currentTimeOfDay*24)*60))).ToString("00");
 		currentTimeOfDay = time - (int)time;
 		if (currentTimeOfDay >= 1) {
 			currentTimeOfDay = 0;
