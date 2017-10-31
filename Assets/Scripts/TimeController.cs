@@ -7,7 +7,7 @@ public class TimeController : MonoBehaviour {
 	// Informacje o czasie
 	[Header("Time")]
 
-	[SerializeField] private float time = 0.5f;
+	[SerializeField] private float time = 0f;
 					 public static float timeDisplay;
 	[SerializeField] private float day;
 					 public static float dayDisplay;
@@ -21,7 +21,8 @@ public class TimeController : MonoBehaviour {
 	[SerializeField] private Light environmentalLight;
 	[SerializeField] private Material skybox;
 	// Zmienna sterująca czasem gry ile minut irl to 24h w grze
-	[SerializeField] private float minutesInAFullDay = 10f;
+	[SerializeField] private float minutesInAFullDay = 24f;
+					 public static float minutesInAFullDayDisplay;
 
 	// Aktualny czas dnia pobierany z czasu globalnego
 	private float currentTimeOfDay;
@@ -30,18 +31,24 @@ public class TimeController : MonoBehaviour {
 	void Start () {
 		// Podczas startu gry skrypt przyjmuje intensywność oświetlenia z światła kierunkowego
 		sunInitialIntenisty = environmentalLight.intensity;
+		minutesInAFullDayDisplay = minutesInAFullDay;
 	}
 
 	void Update () {
+		if (Input.GetKey(KeyCode.Q)) {
+			adjustTime(-0.005f);
+		} else if (Input.GetKey(KeyCode.E)) {
+			adjustTime(0.005f);
+		}
 		updateSun();
-		time += (Time.deltaTime / (minutesInAFullDay * 60));
+		updateDisplay();
+		time += Time.deltaTime / (minutesInAFullDay * 60);
 		day = (int)time;
         hour = (int)(currentTimeOfDay*24)+":"+((int)((currentTimeOfDay*24*60) - ((int)(currentTimeOfDay*24)*60))).ToString("00");
 		currentTimeOfDay = time - (int)time;
 		if (currentTimeOfDay >= 1) {
 			currentTimeOfDay = 0;
 		}
-		updateDisplay();
 	}
 
 	void updateSun () {
@@ -89,5 +96,9 @@ public class TimeController : MonoBehaviour {
 		timeDisplay = time;
 		dayDisplay = day;
 		hourDisplay = hour;
+	}
+
+	void adjustTime (float t) {
+		time += t;
 	}
 }

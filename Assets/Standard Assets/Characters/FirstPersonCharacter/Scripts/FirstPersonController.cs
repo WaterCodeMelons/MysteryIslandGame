@@ -14,6 +14,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private bool m_IsWalking;
         [SerializeField] private float m_WalkSpeed;
         [SerializeField] private float m_RunSpeed;
+        [SerializeField] private int maxRunStamina = 100;
+        [SerializeField] private int staminaDecay = 10;
+        [SerializeField] private int staminJumpDecay = 25;
+                         private int m_StaminaDecay;
+        [SerializeField] private int staminaRegenMultiplier = 3;
+        [SerializeField] private float runStamina;
+        public GameObject staminaBar;
         [SerializeField] [Range(0f, 1f)] private float m_RunstepLenghten;
         [SerializeField] private float m_JumpSpeed;
         [SerializeField] private float m_StickToGroundForce;
@@ -42,8 +49,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
-        public Text text;
-        private int runStamina = 100;
         // Use this for initialization
         private void Start()
         {
@@ -57,6 +62,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+            runStamina = maxRunStamina;
+            m_StaminaDecay = staminaDecay;
         }
 
 
@@ -65,7 +72,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             RotateView();
             // the jump state needs to read here to make sure it is not missed
-            if (!m_Jump)
+            if (!m_Jump && runStamina > staminJumpDecay)
             {
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
@@ -76,6 +83,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 PlayLandingSound();
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
+                m_StaminaDecay = staminaDecay;
             }
             if (!m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
             {
@@ -115,8 +123,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_MoveDir.y = -m_StickToGroundForce;
 
-                if (m_Jump)
+                if (m_Jump && runStamina > staminJumpDecay)
                 {
+                    runStamina -= 25;
+                    m_StaminaDecay = 0;
                     m_MoveDir.y = m_JumpSpeed;
                     PlayJumpSound();
                     m_Jump = false;
@@ -220,21 +230,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
             speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
             m_Input = new Vector2(horizontal, vertical);
 
-            if (!m_IsWalking && runStamina!=0)
+            if (!m_IsWalking && runStamina>=0)
             {
-                runStamina--;
-                text.text = runStamina.ToString();
+                runStamina = Mathf.Clamp(runStamina - Time.deltaTime * m_StaminaDecay, 0, maxRunStamina);
+                float stamina = runStamina/maxRunStamina;
+                staminaBar.transform.localScale = new Vector3(stamina, 1, 1);
             }
             else
             {
-                if (runStamina != 100 && !Input.GetKey(KeyCode.LeftShift))
+                if (runStamina <= maxRunStamina && !Input.GetKey(KeyCode.LeftShift))
                 {
-                    runStamina++;
-                    text.text = runStamina.ToString();
+                    runStamina = Mathf.Clamp(runStamina + Time.deltaTime * m_StaminaDecay * staminaRegenMultiplier, 0, maxRunStamina);
+                    float stamina = runStamina/maxRunStamina;
+                    staminaBar.transform.localScale = new Vector3(stamina, 1, 1);
 
                 }
             }
-            if (runStamina == 0)
+            if (runStamina <= 0)
             {
                 speed = m_WalkSpeed;
             }
