@@ -6,17 +6,11 @@ using UnityEngine.UI;
 public class TimeDisplay : MonoBehaviour {
     public Text timeDisplay;
     public Text dayDisplay;
-    private GameObject day;
-    private TimeController tc;
-    // Use this for initialization
-    void Start () {
-        day = GameObject.Find("Day");
-        tc = day.GetComponent<TimeController>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        timeDisplay.text = tc.hour;
-        dayDisplay.text = (tc.day + 1.0f).ToString();
-	}
+
+     void Update () {
+        
+        // Because TimeController class has a public static field "time, hour, day" You can access it directly
+        timeDisplay.text = TimeController.hourDisplay;
+        dayDisplay.text = (TimeController.dayDisplay + 1).ToString();
+    }
 }

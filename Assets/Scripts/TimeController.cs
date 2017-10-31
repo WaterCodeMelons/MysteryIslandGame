@@ -6,17 +6,20 @@ public class TimeController : MonoBehaviour {
 
 	// Informacje o czasie
 	[Header("Time")]
-	public float time = 0.5f;
-	public float day;
-	public string hour;
+
+	[SerializeField] private float time = 0.5f;
+					 public static float timeDisplay;
+	[SerializeField] private float day;
+					 public static float dayDisplay;
+	[SerializeField] private string hour;
+					 public static string hourDisplay;
 	
 	[Space]
 
 	[Header("Settings")]
 	// Światło kierunkowe sceny
-	[SerializeField] private Light sun;
-	// Obiekt słońca i księżyca
-	[SerializeField] private GameObject plaskaOrbita;
+	[SerializeField] private Light environmentalLight;
+	[SerializeField] private Material skybox;
 	// Zmienna sterująca czasem gry ile minut irl to 24h w grze
 	[SerializeField] private float minutesInAFullDay = 10f;
 
@@ -26,12 +29,11 @@ public class TimeController : MonoBehaviour {
 
 	void Start () {
 		// Podczas startu gry skrypt przyjmuje intensywność oświetlenia z światła kierunkowego
-		sunInitialIntenisty = sun.intensity;
+		sunInitialIntenisty = environmentalLight.intensity;
 	}
 
 	void Update () {
 		updateSun();
-		// 
 		time += (Time.deltaTime / (minutesInAFullDay * 60));
 		day = (int)time;
         hour = (int)(currentTimeOfDay*24)+":"+((int)((currentTimeOfDay*24*60) - ((int)(currentTimeOfDay*24)*60))).ToString("00");
@@ -39,13 +41,12 @@ public class TimeController : MonoBehaviour {
 		if (currentTimeOfDay >= 1) {
 			currentTimeOfDay = 0;
 		}
+		updateDisplay();
 	}
 
 	void updateSun () {
 		// Obrót światła kierunkowego wokół właśnej osi
-		sun.transform.localRotation = Quaternion.Euler((currentTimeOfDay * 360f) - 90, 170, 0);
-		// Obrót pustego obiektu ze słońcem i księżycem wokół własnej osi
-		plaskaOrbita.transform.localRotation = Quaternion.Euler (0, 170, (currentTimeOfDay * 360f) - 90);
+		environmentalLight.transform.localRotation = Quaternion.Euler((currentTimeOfDay * 360f) - 90, 170, 0);
 
 		float intensityMultiplier = 1;
 
@@ -69,18 +70,24 @@ public class TimeController : MonoBehaviour {
 		}
 
 		// Podstawowy poziom intensywności oświetlenia kierunkowego sceny zostaje pomnożony przez mnożnik tego oświetlenia
-		sun.intensity = sunInitialIntenisty * intensityMultiplier;
+		environmentalLight.intensity = sunInitialIntenisty * intensityMultiplier;
 
 		// Podstawowy kolor mgły RGBA(128, 128, 128, 255) : Color(0.5f, 0.5f, 0.5f, 1f) zostaje pomnożony przez mnożnik intensywności dnia
 		// Noc - kolor czarny rgba(0, 0, 0, 1)
 		// Podczas wschodu kolor zmienia się z czarnego rgba(0, 0, 0, 1) na szary rgba(128, 128, 128, 255)
 		// Podczas zachodu kolor zmienia się z szarego rgba(128, 128, 128, 255) na czarny rgba(0, 0, 0, 255)
-		RenderSettings.fogColor = new Color(0.2f*intensityMultiplier, 0.2f*intensityMultiplier, 0.2f*intensityMultiplier, 1f);
+		RenderSettings.fogColor = new Color(0.35f*intensityMultiplier, 0.35f*intensityMultiplier, 0.35f*intensityMultiplier, 1f);
 
 		// Zmienia ekspozycję skyboxa i blokuje ją pomiędzy [0.25 - 0.8]
-		RenderSettings.skybox.SetFloat("_Exposure", Mathf.Clamp(0.8f * intensityMultiplier, 0.025f, 0.8f));
+		skybox.SetFloat("_Exposure", Mathf.Clamp(0.8f * intensityMultiplier, 0.04f, 0.8f));
 
 		// Zabarwienie skyboxa zostaje zmienione podczas wschodu i zachodu pomiędzy rgba(128, 128, 128, 255) a rgba(128, 128, 255)
-		RenderSettings.skybox.SetColor("_Tint", new Color(0.5f, 0.5f, 1 - 0.5f * intensityMultiplier, 1));
+		skybox.SetColor("_Tint", new Color(0.5f, 0.5f, 1 - 0.5f * intensityMultiplier, 1));
+	}
+
+	void updateDisplay () {
+		timeDisplay = time;
+		dayDisplay = day;
+		hourDisplay = hour;
 	}
 }
