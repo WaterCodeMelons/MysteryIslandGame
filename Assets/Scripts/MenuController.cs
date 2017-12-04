@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
+using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class MenuController : MonoBehaviour
         { // Jeżeli podczas gry klikniemy Escape to przechodzi do metody Pause()
             Pause();
         }
+
     }
 
     public void Pause()
@@ -42,6 +44,5 @@ public class MenuController : MonoBehaviour
 #else
 		Application.Quit(); // Wyjdź z gry
 #endif
-
-	}
+    }
 }
