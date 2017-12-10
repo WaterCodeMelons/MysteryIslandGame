@@ -1,0 +1,10 @@
+﻿{
+  "fov" :  60,
+  "vsync" : 1,
+  "fullscreen" : false,
+  "shadowCascades" : 4,
+  "shadowDistance" : 150,
+  "masterTextureLimit" : 0,
+  "statsDisplay" : true,
+  "timeDisplay" : true
+}
